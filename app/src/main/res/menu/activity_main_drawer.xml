@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:id="@+id/group_top">
+        <item
+            android:id="@+id/nav_books"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="书籍" />
+        <item
+            android:id="@+id/nav_search"
+            android:icon="@drawable/ic_menu_gallery"
+            android:checkable="false"
+            android:title="搜索" />
+    </group>
+
+    <group android:id="@+id/group_tags">
+        <item android:id="@+id/tags"
+            android:title="标签">
+            <menu>
+                <item
+                    android:id="@+id/nav_addTag"
+                    android:icon="@drawable/ic_menu_share"
+                    android:title="添加新标签" />
+            </menu>
+        </item>
+
+    </group>
+
+    <group android:id="@+id/group_ending">
+        <item
+            android:id="@+id/nav_donate"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="捐献"/>
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="设置"/>
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="关于"/>
+    </group>
+
+</menu>

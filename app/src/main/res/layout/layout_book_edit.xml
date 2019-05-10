@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!--                -->
+            <include layout="@layout/layout_book_cover_info" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/be_detail_var_text_view"
+                    style="?android:listSeparatorTextViewStyle"
+                    android:text="详细(来源：DOUBAN.COM)"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
+
+                <RelativeLayout
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp">
+
+                    <ImageView
+                        android:id="@+id/be_reading_status_img"
+                        android:contentDescription="Reading Status"
+                        app:srcCompat="@drawable/ic_reading_status"
+                        android:scaleType="center"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp" />
+
+                    <Spinner
+                        android:id="@+id/be_reading_status_spinner"
+                        android:layout_toEndOf="@+id/be_reading_status_img"
+                        android:layout_toRightOf="@+id/be_reading_status_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:spinnerMode="dropdown"
+                        android:backgroundTint="@color/colorSecondaryText"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:layout_alignParentTop="true" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:orientation="horizontal"
+                    android:layout_marginStart="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp">
+
+                    <ImageView
+                        android:id="@+id/be_bookshelf_img"
+                        android:contentDescription="BookShelf Image"
+                        app:srcCompat="@drawable/ic_bookshelf"
+                        android:scaleType="center"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"  />
+
+                    <Spinner
+                        android:id="@+id/be_bookshelf_spinner"
+                        android:layout_toEndOf="@+id/be_bookshelf_img"
+                        android:layout_toRightOf="@id/be_bookshelf_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:spinnerMode="dropdown"
+                        android:backgroundTint="@color/colorSecondaryText"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:layout_alignParentTop="true"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_marginStart="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp">
+
+                    <ImageView
+                        android:id="@+id/be_note_img"
+                        android:contentDescription="Note"
+                        app:srcCompat="@drawable/ic_notes"
+                        android:scaleType="center"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"  />
+
+                    <EditText
+                        android:id="@+id/be_note_edit"
+                        android:textSize="16sp"
+                        android:layout_toEndOf="@+id/be_note_img"
+                        android:layout_toRightOf="@+id/be_note_img"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:hint="笔记"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_marginStart="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp">
+
+                    <ImageView
+                        android:id="@+id/be_label_img"
+                        android:contentDescription="Label"
+                        app:srcCompat="@drawable/ic_label"
+                        android:scaleType="center"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"  />
+
+                    <EditText
+                        android:id="@+id/be_label_edit"
+                        android:textSize="16sp"
+                        android:layout_toEndOf="@+id/be_label_img"
+                        android:layout_toRightOf="@+id/be_label_img"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:hint="添加标签"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_marginStart="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp">
+
+                    <ImageView
+                        android:id="@+id/be_web_img"
+                        android:contentDescription="Note"
+                        app:srcCompat="@drawable/ic_website"
+                        android:scaleType="center"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"  />
+
+                    <EditText
+                        android:id="@+id/be_web_edit"
+                        android:textSize="16sp"
+                        android:layout_toEndOf="@+id/be_web_img"
+                        android:layout_toRightOf="@+id/be_web_img"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:hint="网站"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</LinearLayout>

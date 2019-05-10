@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3fb5b1</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimaryLight">#01B69D</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="white">#FFFFFF</color>
+    <color name="colorPrimaryText">#212121</color>
+    <color name="colorSecondaryText">#757575</color>
+    <color name="actionbar_opacity">#33000000</color>
+    <color name="recycler_item_selected">#ebf2ff</color>
+    <color name="selected_primary">#607D8B</color>
+    <color name="selected_primary_dark">#455A64</color>
+</resources>
