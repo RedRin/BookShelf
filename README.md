@@ -1,2 +1,3 @@
 # BookShelf
-仿BookShelf App
+仿BookShelf App  
+https://github.com/smartjinyu/MyBookshelf
