@@ -77,7 +77,7 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 int position = holder.getAdapterPosition();
 
                 BookShelfManager.removeABook(mBookList.get(position));
-                mMainActivity.nowbookList.remove(mBookList.get(position));
+//                mMainActivity.nowbookList.remove(mBookList.get(position));
                 mMainActivity.refreshBookList(mMainActivity.nowbookList);
 
                 //mMainActivity.refreshBookList(MainActivity.bookShelfList.get(mMainActivity.selectedBookshelf).getBookList());
