@@ -310,8 +310,16 @@ public class MainActivity extends AppCompatActivity
                 bookShelfList.remove(selectedBookshelf);
                 refreshBookshelfSpinner();
             }
+            if(bookShelfList.size() == 0){
+                nowbookList = new ArrayList<Book>();
+            } else {
+                nowbookList = bookShelfList.get(0).getBookList();
+            }
+            refreshBookList(nowbookList);
+            return true;
         } else if(id == R.id.action_rename){
             showRenameBookshelf();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
