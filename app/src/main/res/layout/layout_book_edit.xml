@@ -29,7 +29,7 @@
                 <TextView
                     android:id="@+id/be_detail_var_text_view"
                     style="?android:listSeparatorTextViewStyle"
-                    android:text="详细(来源：DOUBAN.COM)"
+                    android:text="详细(来源：腾讯云)"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 

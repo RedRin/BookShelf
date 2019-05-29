@@ -144,8 +144,14 @@ public class BookShelfManager {
         MainActivity.bookShelfList.get(bookShelfPos).getBookList().add(book);
     }
 
-    public static void removeABook(int bookShelfPos, int bookPos){
-        MainActivity.bookShelfList.get(bookShelfPos).getBookList().remove(bookPos);
+    public static void removeABook(Book book){
+        for(BookShelf bookShelf : MainActivity.bookShelfList){
+            for(int i=0; i<bookShelf.getBookList().size(); i++){
+                if(book.getUuid().equals(bookShelf.getBookList().get(i).getUuid())){
+                    bookShelf.getBookList().remove(i);
+                }
+            }
+        }
     }
 
     public static void setABook(int bookShelfPos, int bookPos, Book book){

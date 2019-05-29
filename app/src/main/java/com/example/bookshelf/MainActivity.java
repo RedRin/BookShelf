@@ -1,12 +1,16 @@
 package com.example.bookshelf;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,11 +37,19 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.bookshelf.Util.MySpinner;
+import com.example.bookshelf.Util.Util;
 import com.github.clans.fab.FloatingActionMenu;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
+import com.yzq.zxinglibrary.android.CaptureActivity;
+import com.yzq.zxinglibrary.common.Constant;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,6 +73,7 @@ public class MainActivity extends AppCompatActivity
 
     // TODO 替换;
     ArrayList<String> tags = new ArrayList<>();  //标签
+    List<Book> nowbookList = new ArrayList<>();  //当前显示的书籍
     public static List<BookShelf> bookShelfList = new ArrayList<BookShelf>();  //所有的bookshelf
     ArrayAdapter<String> bookshelfAdapter;
     Spinner bookshelfSpinner;
@@ -72,19 +85,30 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getPrivilege();  //动态获取权限
         toolbar = (Toolbar) findViewById(R.id.toolbar_activity_main);
         setSupportActionBar(toolbar);
 
         //右下角图标
         FloatingActionMenu fab=(FloatingActionMenu)findViewById(R.id.fab);
         fab.setClosedOnTouchOutside(true);
+        //扫码添加
+        com.github.clans.fab.FloatingActionButton fab_camera = (com.github.clans.fab.FloatingActionButton)findViewById(R.id.fab_add_camera);
+        fab_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO:扫码添加
+                jumpToScan();
+            }
+        });
+
         //单独添加
         com.github.clans.fab.FloatingActionButton fab_single = (com.github.clans.fab.FloatingActionButton)findViewById(R.id.fab_add_single);
         fab_single.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //  TODO 扫描添加按钮；
-                jumpToBookEdit();
+                //  TODO isbn添加按钮；
+                addBookByIsbn();
             }
         });
         //批量添加
@@ -92,8 +116,8 @@ public class MainActivity extends AppCompatActivity
         fab_batch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO:批量添加
-
+                //TODO:手动添加
+                jumpToBookEdit();
             }
         });
 
@@ -118,8 +142,10 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    public void refreshBookList(BookShelf bookShelf){
-        bookAdapter = new BookAdapter(this, bookShelf.getBookList());
+
+
+    public void refreshBookList(List<Book> bookList){
+        bookAdapter = new BookAdapter(this, bookList);
         bookListView.setAdapter(bookAdapter);
         bookAdapter.notifyDataSetChanged();
     }
@@ -129,25 +155,6 @@ public class MainActivity extends AppCompatActivity
         bookShelfManager.read(MainActivity.this);
 
         bookShelfList = bookShelfManager.getBookShelfList();
-//        //测试
-//        List<Book> bookList = new ArrayList<Book>();
-//        bookList.add(new Book("计算机网络"));
-//        bookList.add(new Book("软件工程"));
-//        bookList.add(new Book("软件系统分析"));
-//        bookList.add(new Book("算法导论"));
-//        BookShelf bookShelf1 = new BookShelf("计算机", bookList);
-//
-//        List<Book> bookList2 = new ArrayList<Book>();
-//        bookList2.add(new Book("诺艾尔"));
-//        bookList2.add(new Book("乃乃香"));
-//        BookShelf bookShelf2 = new BookShelf("天体的秩序", bookList2);
-//        bookShelfList.add(bookShelf1);
-//        bookShelfList.add(bookShelf2);
-
-//        BookShelf bookShelf1 = new BookShelf("计算机", new ArrayList<Book>());
-//        BookShelf bookShelf2 = new BookShelf("计算机", new ArrayList<Book>());
-//        bookShelfList.add(bookShelf1);
-//        bookShelfList.add(bookShelf2);
         // TODO: 2019/4/20 添加书架
         ArrayList<String> bookshelfNames = new ArrayList<String>();
         for(int i=0;i<bookShelfList.size(); i++){
@@ -158,11 +165,9 @@ public class MainActivity extends AppCompatActivity
 
     // TODO 启动扫码功能；
     private void jumpToScan() {
-        //启动扫描二维码/条纹码；
-        IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
-        //重新空的Activity继承CaptureActivity，并配置参数使扫描竖屏；
-        integrator.setCaptureActivity(ScanActivity.class);
-        integrator.initiateScan();
+        Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+        startActivityForResult(intent, MainActivity.SCAN_INTENT_CODE);
+
     }
 
     // TODO 跳转书籍编辑页面；
@@ -225,6 +230,7 @@ public class MainActivity extends AppCompatActivity
         //输入键盘回车键变为搜索图标；
         searchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
             @Override
             public boolean onQueryTextSubmit(String s) {
                 Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
@@ -236,6 +242,23 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextChange(String s) {
+                if(s.isEmpty()){
+                    nowbookList = (ArrayList<Book>) bookShelfList.get(selectedBookshelf).getBookList();
+                    refreshBookList(nowbookList);
+                } else {
+                    List<Book> ret = new ArrayList<Book>();
+                    for(int i=0; i<nowbookList.size(); i++){
+                        Book book = nowbookList.get(i);
+                        if(book.getTitle().contains(s)){
+                            ret.add(book);
+                        } else if(book.getAuthor().contains(s)){
+                            ret.add(book);
+                        } else if(book.getPubCompany().contains(s)){
+                            ret.add(book);
+                        }
+                    }
+                    refreshBookList(ret);
+                }
                 return false;
             }
         });
@@ -243,7 +266,8 @@ public class MainActivity extends AppCompatActivity
         MenuItem bookshelvesItem = menu.findItem(R.id.action_bookshelves);
         bookshelfSpinner = (Spinner)MenuItemCompat.getActionView(bookshelvesItem);
         // TODO 设置下拉栏； bookshelf名字过滤
-        List<String> bookshelfNames = loadBookshelfs();
+        List<String> bookshelfNames = new ArrayList<>();
+        bookshelfNames.addAll(loadBookshelfs());
         bookshelfAdapter = new ArrayAdapter<String>(MainActivity.this,
                 R.layout.support_simple_spinner_dropdown_item, bookshelfNames);
         bookshelfSpinner.setAdapter(bookshelfAdapter);
@@ -252,8 +276,8 @@ public class MainActivity extends AppCompatActivity
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 //TODO 选中某个书架后
                 selectedBookshelf = i;
-                Toast.makeText(MainActivity.this, selectedBookshelf+"", Toast.LENGTH_SHORT).show();
-                refreshBookList(bookShelfList.get(selectedBookshelf));
+                nowbookList = (ArrayList<Book>) bookShelfList.get(selectedBookshelf).getBookList();
+                refreshBookList(nowbookList);
             }
 
             @Override
@@ -280,25 +304,14 @@ public class MainActivity extends AppCompatActivity
             //TODO: 排序
             showSortDialog();
 
-            refreshBookshelfSpinner();
-
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Bitmap bitmap = ImageManager.GetImageInputStream("https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1555746626&di=5a00d7e2542631cfdff9988793e27782&src=http://nres.ingdan.com/uploads/20160201/1454287776483324.png");
-//                    if(ImageManager.IsImageExists(MainActivity.this,"testImg"))
-//                        Log.e("test", "run: 文件已存在");
-//                    else
-//                        if(ImageManager.SaveImage(MainActivity.this, bitmap, "testImg"))
-//                            Log.d("test", "run: 保存成功");
-//                }
-//            }).start();
-//
-//            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-//            Toast.makeText(this, uuid, Toast.LENGTH_SHORT).show();
-
-
             return true;
+        } else if(id == R.id.action_delete){
+            if(bookShelfList.size() > 0){
+                bookShelfList.remove(selectedBookshelf);
+                refreshBookshelfSpinner();
+            }
+        } else if(id == R.id.action_rename){
+            showRenameBookshelf();
         }
 
         return super.onOptionsItemSelected(item);
@@ -328,6 +341,65 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    Handler refreshBookListHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if(msg.what == 1){
+                refreshBookList(bookShelfList.get(selectedBookshelf).getBookList());
+            } else if(msg.what == 2){
+                Toast.makeText(MainActivity.this, "没有找到这本书", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
+
+    // 显示添加书架对话框；
+    @SuppressLint("ResourceAsColor")
+    private void addBookByIsbn() {
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(MainActivity.this);
+        builder.title("请输入isbn")
+                .inputRange(1, 13, getResources().getColor(R.color.colorAccent))
+                .input(R.string.hint_isbn, R.string.prefill_tag, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        // 获取输入的书架名字
+                        final String  isbn = input.toString();
+                        if(input.length() != 0) {
+                            new Thread(){
+                                public void run(){
+                                    Book book = BookInfoManager.getBookFromISBN(MainActivity.this, isbn);
+                                    if(book != null){
+                                        BookShelfManager.addABook(selectedBookshelf, book);
+                                        refreshBookListHandler.sendEmptyMessage(1);
+                                    } else {
+                                        refreshBookListHandler.sendEmptyMessage(2);
+                                    }
+                                }
+                            }.start();
+
+                        }
+
+
+                    }
+                })
+                .positiveText("确定")
+                .negativeText("取消")
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        //确认按下响应
+                    }
+                }).show();
+    }
+
 
         // 显示添加对话框；
     @SuppressLint("ResourceAsColor")
@@ -388,12 +460,84 @@ public class MainActivity extends AppCompatActivity
                         if (TextUtils.isEmpty(text)) {
                             Toast.makeText(MainActivity.this, "请选择排序", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MainActivity.this, which+"", Toast.LENGTH_SHORT).show();
                             //  TODO 查找 text 在 sortSect 中的位置；
-
+                            switch(which){
+                                case 0:
+                                    Collections.sort(nowbookList, new Comparator<Book>(){
+                                        @Override
+                                        public int compare(Book book, Book t1) {
+                                            return book.getTitle().compareTo(t1.getTitle());
+                                        }
+                                    });
+                                    refreshBookList(nowbookList);
+                                    break;
+                                case 1:
+                                    Collections.sort(nowbookList, new Comparator<Book>(){
+                                        @Override
+                                        public int compare(Book book, Book t1) {
+                                            return book.getAuthor().compareTo(t1.getAuthor());
+                                        }
+                                    });
+                                    refreshBookList(nowbookList);
+                                    break;
+                                case 2:
+                                    Collections.sort(nowbookList, new Comparator<Book>(){
+                                        @Override
+                                        public int compare(Book book, Book t1) {
+                                            return book.getPubCompany().compareTo(t1.getPubCompany());
+                                        }
+                                    });
+                                    refreshBookList(nowbookList);
+                                    break;
+                                case 3:
+                                    Collections.sort(nowbookList, new Comparator<Book>(){
+                                        @Override
+                                        public int compare(Book book, Book t1) {
+                                            if(book.getPubYear().equals(t1.getPubYear())){
+                                                return book.getPubMonth().compareTo(t1.getPubMonth());
+                                            }
+                                            return book.getPubYear().compareTo(t1.getPubYear());
+                                        }
+                                    });
+                                    refreshBookList(nowbookList);
+                            }
                             dialog.dismiss();
                         }
                         return false;
+                    }
+                }).show();
+    }
+
+    @SuppressLint("ResourceAsColor")
+    private void showRenameBookshelf() {
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(MainActivity.this);
+        builder.title("书架名称")
+                .inputRange(1, 10, getResources().getColor(R.color.colorAccent))
+                .input(R.string.hint_bookshelf, R.string.prefill_tag, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        // 获取输入的书架名字
+                        if(input.length() != 0) {
+                            bookShelfList.get(selectedBookshelf).setBookshelfName(input.toString());
+                            //TODO 刷新主界面的spinner
+                            selectedBookshelf = MainActivity.bookShelfList.size()-1;
+                            refreshBookshelfSpinner();
+                        }
+                    }
+                })
+                .positiveText("确定")
+                .negativeText("取消")
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        //确认按下响应
                     }
                 }).show();
     }
@@ -404,19 +548,23 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case MainActivity.SCAN_INTENT_CODE:
                 // TODO 扫码返回；
-                IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-                if (scanResult != null) {
-                    if (scanResult.getFormatName().equals("EAN_13") && scanResult.getContents().startsWith("978")) {
-                        Toast.makeText(MainActivity.this, "ISBN: " + scanResult.getContents(), Toast.LENGTH_SHORT).show();
-                        // TODO 豆瓣API；
-
-                    }
-                    else
-                        Toast.makeText(MainActivity.this, "NOT BOOK!", Toast.LENGTH_SHORT).show();
+                if (data != null) {
+                    final String content = data.getStringExtra(Constant.CODED_CONTENT);
+                    new Thread(){
+                        public void run(){
+                            Book book = BookInfoManager.getBookFromISBN(MainActivity.this, content);
+                            if(book != null){
+                                BookShelfManager.addABook(selectedBookshelf, book);
+                                refreshBookListHandler.sendEmptyMessage(1);
+                            } else {
+                                refreshBookListHandler.sendEmptyMessage(2);
+                            }
+                        }
+                    }.start();
                 }
                 break;
             case MainActivity.EDIT_INTENT_CODE:
-                refreshBookList(bookShelfList.get(selectedBookshelf));
+                refreshBookList(bookShelfList.get(selectedBookshelf).getBookList());
                 refreshBookshelfSpinner();
                 break;
         }
@@ -429,5 +577,36 @@ public class MainActivity extends AppCompatActivity
         bookShelfManager.setBookShelfList(bookShelfList);
         bookShelfManager.save(MainActivity.this);
         super.onDestroy();
+    }
+
+    private void getPrivilege(){
+        List<String> permissionList = new ArrayList<>();
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            permissionList.add(Manifest.permission.CAMERA);
+        }
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
+            permissionList.add(Manifest.permission.INTERNET);
+        }
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED){
+            permissionList.add(Manifest.permission.ACCESS_NETWORK_STATE);
+        }
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED){
+            permissionList.add(Manifest.permission.ACCESS_WIFI_STATE);
+        }
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS) != PackageManager.PERMISSION_GRANTED){
+            permissionList.add(Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS);
+        }
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+
+        if(!permissionList.isEmpty()){
+            String [] permissions = permissionList.toArray(new String[permissionList.size()]);
+            ActivityCompat.requestPermissions(MainActivity.this, permissions, 1);
+        }
     }
 }

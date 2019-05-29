@@ -89,8 +89,11 @@ public class BookEditActivity extends AppCompatActivity {
         selectedBookshelf = MainActivity.selectedBookshelf;
         if(book!=null){
             //TODO: 图片
-            Bitmap bitmap = ImageManager.GetLocalBitmap(BookEditActivity.this, "testImg");
-            book_cover_img.setImageBitmap(bitmap);
+            Bitmap bitmap = ImageManager.GetLocalBitmap(BookEditActivity.this, book.getUuid());
+            if(bitmap != null){
+                book_cover_img.setImageBitmap(bitmap);
+            }
+
 
             cover_book_title_edit.setText(book.getTitle());
             cover_book_author_edit.setText(book.getAuthor());
@@ -243,7 +246,7 @@ public class BookEditActivity extends AppCompatActivity {
                 book.setBookNote(be_note_edit.getText().toString());
                 book.setTag(be_label_edit.getText().toString());
                 book.setWebsite(be_web_edit.getText().toString());
-                book.setReadStatus(selectedStatus);
+
 
                 Intent intent = new Intent();
                 if(isNull){
@@ -252,8 +255,8 @@ public class BookEditActivity extends AppCompatActivity {
                     if(selectedBookshelf == MainActivity.selectedBookshelf)
                         BookShelfManager.setABook(selectedBookshelf, selectedBookPos, book);
                     else{
+                        BookShelfManager.removeABook(book);
                         BookShelfManager.addABook(selectedBookshelf, book);
-                        BookShelfManager.removeABook(MainActivity.selectedBookshelf, selectedBookPos);
                     }
 
                 }
@@ -274,6 +277,14 @@ public class BookEditActivity extends AppCompatActivity {
                     Toast.makeText(BookEditActivity.this, data.getData()+"", Toast.LENGTH_SHORT).show();
                     //TODO:本地图片转为bitmap
                     book_cover_img.setImageURI(data.getData());
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
+                        ImageManager.SaveImage(BookEditActivity.this, bitmap, book.getUuid());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
 
 
                 }

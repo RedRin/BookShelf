@@ -41,6 +41,15 @@
         app:menu_backgroundColor="#ccffffff">
 
 
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_add_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/colorAccent"
+
+            android:src="@drawable/ic_edit"
+            app:fab_size="mini"
+            app:fab_label="扫码添加" />
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab_add_single"
@@ -50,7 +59,7 @@
 
             android:src="@drawable/ic_edit"
             app:fab_size="mini"
-            app:fab_label="添加书籍" />
+            app:fab_label="isbn添加" />
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab_add_batch"
@@ -60,7 +69,7 @@
 
             android:src="@drawable/ic_edit"
             app:fab_size="mini"
-            app:fab_label="批量添加" />
+            app:fab_label="手动添加" />
 
     </com.github.clans.fab.FloatingActionMenu>
 

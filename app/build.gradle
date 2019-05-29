@@ -5,7 +5,7 @@ android {
     buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "com.example.bookshelf"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -31,10 +31,11 @@ dependencies {
     //androidTestCompile 'com.android.support.test.espresso:espresso-core:3.0.2'
     compile 'com.afollestad.material-dialogs:core:0.9.1.0'
     compile 'com.afollestad.material-dialogs:commons:0.9.1.0'
-    compile 'com.journeyapps:zxing-android-embedded:3.5.0'
+    //compile 'com.journeyapps:zxing-android-embedded:3.5.0'
+    compile 'com.github.yuzhiqiang1993:zxing:2.2.1'
     compile 'com.github.clans:fab:1.6.4'
-
     configurations {
         all*.exclude group: 'com.android.support', module: 'support-v13'
     }
+    compile files('libs/gson-2.2.4.jar')
 }

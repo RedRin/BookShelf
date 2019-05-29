@@ -56,7 +56,6 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.lv_item_view, parent, false);
         final BookHolder holder = new BookHolder(view);
 
-
         holder.book_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -76,8 +75,12 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             public boolean onLongClick(View view) {
                 //TODO: 删除书籍
                 int position = holder.getAdapterPosition();
-                BookShelfManager.removeABook(mMainActivity.selectedBookshelf, position);
-                mMainActivity.refreshBookList(MainActivity.bookShelfList.get(mMainActivity.selectedBookshelf));
+
+                BookShelfManager.removeABook(mBookList.get(position));
+                mMainActivity.nowbookList.remove(mBookList.get(position));
+                mMainActivity.refreshBookList(mMainActivity.nowbookList);
+
+                //mMainActivity.refreshBookList(MainActivity.bookShelfList.get(mMainActivity.selectedBookshelf).getBookList());
                 return false;
             }
         });
@@ -107,8 +110,11 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
 
         //Bitmap bitmap = BitmapFactory.decodeResource(mMainActivity.getResources(), R.drawable.test);
-        Bitmap bitmap = ImageManager.GetLocalBitmap(mMainActivity, "testImg");
-        bookHolder.imgBook.setImageBitmap(bitmap);
+        Bitmap bitmap = ImageManager.GetLocalBitmap(mMainActivity, book.getUuid());
+        if(bitmap != null){
+            bookHolder.imgBook.setImageBitmap(bitmap);
+        }
+
     }
 
     @Override

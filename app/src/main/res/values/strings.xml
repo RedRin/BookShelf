@@ -8,6 +8,7 @@
     <string name="action_settings">Settings</string>
     <string name="hint_tag">输入新标签的名称</string>
     <string name="hint_bookshelf">输入新的书架的名称</string>
+    <string name="hint_isbn">输入ISBN</string>
     <string name="prefill_tag" />
     <string name="title_activity_book_edit">编辑书籍详情</string>
 </resources>
